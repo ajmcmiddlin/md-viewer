@@ -1,0 +1,58 @@
+<html>
+	<head><title>Markdown Viewer</title>
+		<link rel="stylesheet" type="text/css" href="./md-viewer.css" />
+		<script type="text/javascript" src="./Markdown.Converter.js"></script>
+		<script type="text/javascript">
+			var file = null;
+			function parseFile() {
+				if (file != null) {
+					var rdr = new FileReader();
+					// Closure that returns a function closing over the file that has been loaded
+					rdr.onload = (function(fileToLoad) {
+						return function(fileLoadevent) {
+							var converter = new Markdown.Converter();
+							var html = converter.makeHtml(fileLoadevent.target.result);
+							document.getElementById('file-header').innerHTML =
+								'<label name="file-name"><strong>Loaded File:</strong> ' + fileToLoad.name + '</label>';
+							document.getElementById('output').innerHTML = html;
+						};
+					})(file);
+					rdr.readAsText(file);
+
+					var reloadDelay = document.getElementById('reload-delay-ms').value;
+					setTimeout(parseFile, reloadDelay);
+				}
+			}
+
+			function handleSelectFile(e) {
+				if (e.target.files[0] != null) {
+					file = e.target.files[0];
+					parseFile();
+				}
+			}
+
+			function windowOnLoad() {
+				if (window.File && window.FileReader && window.FileList && window.Blob) {
+					// Everything we need is available
+				} else {
+					alert('The File APIs are not fully supported in this browser.');
+				}
+
+				document.getElementById('file').addEventListener('change', handleSelectFile, false);
+			}
+
+			window.onload = windowOnLoad;
+		</script>
+	</head>
+
+	<body>
+		<div id="controls">
+			<input type="file" id="file" />
+			<label name="reload-delay-ms">Reload Delay:</label><input type="text" name="reload-delay-ms" id="reload-delay-ms" value="1000" />
+		</div>
+		<div id="file-header">
+		</div>
+		<div id="output">
+		</div>
+	</body>
+</html>
