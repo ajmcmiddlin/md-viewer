@@ -9,7 +9,7 @@ Currently this is very much in alpha and is something I hacked together in an ev
 
 Using md-viewer
 ===============
-To use md-viewer, simply open it in a browser (so far only tested in Chrome), open your Markdown file in the file picker, and start writing. As you work, your file will be automatically reloaded as HTML in the browser. The delay between reloads may be set at the top of the page, and you can re-style the output by editing `md-viewer.css`.
+To use md-viewer, simply open it in a browser (so far only tested in Chrome), open your Markdown file in the file picker, and start writing. As you work, your file will be automatically reloaded as HTML in the browser. The delay between reloads may be set at the top of the page, and you can re-style the output by editing `md-viewer.css`. The default style imports `foghorn.css`, which has been gratefully stolen from [jasonm23](https://github.com/jasonm23/markdown-css-themes), and adds a few modifications.
 
 License
 =======
