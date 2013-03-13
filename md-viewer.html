@@ -4,24 +4,34 @@
 		<script type="text/javascript" src="./Markdown.Converter.js"></script>
 		<script type="text/javascript">
 			var file = null;
+			var lastModifiedDate = null;
+			var paused = false;
+
+			function shouldReload() {
+				return file != null &&
+					(lastModifiedDate == null ||
+					 file.lastModifiedDate.valueOf() != lastModifiedDate.valueOf()) &&
+					!paused;
+			}
+
 			function parseFile() {
-				if (file != null) {
+				if (shouldReload()) {
 					var rdr = new FileReader();
 					// Closure that returns a function closing over the file that has been loaded
 					rdr.onload = (function(fileToLoad) {
 						return function(fileLoadevent) {
 							var converter = new Markdown.Converter();
 							var html = converter.makeHtml(fileLoadevent.target.result);
-							document.getElementById('file-header').innerHTML =
-								'<label name="file-name"><strong>Loaded File:</strong> ' + fileToLoad.name + '</label>';
+							document.getElementById('file-name').innerText = fileToLoad.name;
 							document.getElementById('output').innerHTML = html;
+							lastModifiedDate = fileToLoad.lastModifiedDate;
 						};
 					})(file);
 					rdr.readAsText(file);
-
-					var reloadDelay = document.getElementById('reload-delay-ms').value;
-					setTimeout(parseFile, reloadDelay);
 				}
+
+				var reloadDelay = document.getElementById('reload-delay-ms').value;
+				setTimeout(parseFile, reloadDelay);
 			}
 
 			function handleSelectFile(e) {
@@ -41,16 +51,33 @@
 				document.getElementById('file').addEventListener('change', handleSelectFile, false);
 			}
 
+			function onClickPause() {
+				paused = !paused;
+				document.getElementById("pause-button").style.display = "none";
+				document.getElementById("resume-button").style.display = "inline";
+				return false;
+			}
+
+			function onClickResume() {
+				paused = !paused;
+				document.getElementById("pause-button").style.display = "inline";
+				document.getElementById("resume-button").style.display = "none";
+				return false;
+			}
+
 			window.onload = windowOnLoad;
 		</script>
 	</head>
 
 	<body>
-		<div id="controls">
-			<input type="file" id="file" />
-			<label name="reload-delay-ms">Reload Delay:</label><input type="text" name="reload-delay-ms" id="reload-delay-ms" value="1000" />
-		</div>
-		<div id="file-header">
+		<div id="header">
+			<div id="controls">
+				<input type="file" id="file" />
+				<label for="reload-delay-ms">Reload Delay:</label><input type="text" name="reload-delay-ms" id="reload-delay-ms" value="1000" />
+				<a href="#" title="Pause refreshing" id="pause-button" onclick="onClickPause()">||</a>
+				<a href="#" title="Resume refreshing" id="resume-button" onclick="onClickResume()">></a>
+			</div>
+			<div id="file-header"><strong>Loaded File: </strong><span id="file-name"></span></div>
 		</div>
 		<div id="output">
 		</div>
